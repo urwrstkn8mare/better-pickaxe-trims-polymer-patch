@@ -1,0 +1,29 @@
+{
+	"schemaVersion": 1,
+	"id": "better-pickaxe-trims-polymer-patch",
+	"version": "${version}",
+	"name": "Polymer Patch for Better Pickaxe Trims",
+	"description": "Polymer bridge for Better Pickaxe Trims on server-side Fabric.",
+	"authors": [
+		"Patbox"
+	],
+	"contact": {
+		"sources": "https://github.com/PolymerPorts/better-pickaxe-trims-polymer-patch"
+	},
+	"license": "LGPL-3.0-only",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"eu.pb4.betterpickaxetrimspatch.impl.BetterPickaxeTrimsPolymerPatch"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"fabric-api": "*",
+		"minecraft": ">=26.1-",
+		"java": ">=25",
+		"polymer-core": "*",
+		"polymer-resource-pack": "*",
+		"pickaxetrims": "*"
+	}
+}

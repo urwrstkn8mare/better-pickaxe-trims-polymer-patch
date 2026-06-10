@@ -1,0 +1,54 @@
+plugins {
+	id 'net.fabricmc.fabric-loom' version '1.16.+'
+	id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories {
+	maven { url 'https://maven.nucleoid.xyz' }
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	implementation 'eu.pb4:polymer-core:0.16.5+26.1.2'
+	implementation 'eu.pb4:polymer-resource-pack:0.16.5+26.1.2'
+	implementation 'eu.pb4:polymer-autohost:0.16.5+26.1.2'
+
+	// Optional: compiled against, but not bundled and not required at runtime.
+	compileOnly('eu.pb4:polydex:1.9.3+26.1.2') { transitive = false }
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+}
+
+java {
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+}
