@@ -1,6 +1,7 @@
 package eu.pb4.betterpickaxetrimspatch.impl;
 
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import eu.pb4.polymer.core.api.item.PolymerItemUtils;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentType;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemLore;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 public final class TrimmedPickaxePolymerItem implements PolymerItem {
@@ -42,11 +44,24 @@ public final class TrimmedPickaxePolymerItem implements PolymerItem {
 			return;
 		}
 
-		stack.set(DataComponents.LORE, new ItemLore(List.of(
-				Component.literal("Pickaxe Trim:").withStyle(ChatFormatting.GRAY),
-				Component.literal(" " + trim.material()).withStyle(trim.color()),
-				Component.literal(" " + trim.description()).withStyle(trim.color())
-		)));
+		// Polymer's createItemStack hides the enchantments (and other) components via
+		// TOOLTIP_DISPLAY and bakes the full computed tooltip — enchantment lines included —
+		// into LORE before this runs. Insert the trim lines into that existing lore rather than
+		// replacing it, otherwise the baked enchantment lines vanish from the tooltip.
+		var lines = new ArrayList<>(stack.getOrDefault(DataComponents.LORE, ItemLore.EMPTY).lines());
+		if (lines.stream().anyMatch(line -> line.getString().equals("Pickaxe Trim:"))) {
+			return;
+		}
+
+		lines.add(0, cleanLore(Component.literal("Pickaxe Trim:").withStyle(ChatFormatting.GRAY)));
+		lines.add(1, cleanLore(Component.literal(" " + trim.material()).withStyle(trim.color())));
+		lines.add(2, cleanLore(Component.literal(" " + trim.description()).withStyle(trim.color())));
+		stack.set(DataComponents.LORE, new ItemLore(lines));
+	}
+
+	/** Wraps a trim line so it renders non-italic, matching the lore lines Polymer bakes in. */
+	private static Component cleanLore(Component line) {
+		return Component.empty().append(line).setStyle(PolymerItemUtils.CLEAN_STYLE);
 	}
 
 	static void appendTrimTooltip(List<Component> tooltip, PickaxeTrim trim) {
